@@ -1,0 +1,67 @@
+﻿@if (ViewBag.jobs != null)
+{
+    string value = (ViewBag.jobs.Count == 1) ? "Match" : "Matches";
+
+    <text>@ViewBag.jobs.Count @value</text>
+
+    <table class="job-listing">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Skill</th>
+            <th>Position</th>
+            <th>Employer</th>
+            <th>Location</th>
+        </tr>
+
+        @foreach (Job? job in ViewBag.jobs)
+        {
+
+            if (job == null)
+            {
+                continue;
+            }
+            <tr>
+                <td>
+                    @job.Id
+                </td>
+                <td>
+                    @job.Name
+                </td>
+                <td>
+                    <form asp-controller="Search" asp-action="Results" method="post">
+                        <input hidden name="searchType" value="coreCompetency"/>
+                        <input hidden name="searchTerm" value="@job.CoreCompetency"/>
+                        <input type="submit" class="btn btn-link" value="@job.CoreCompetency"/>
+                    </form>
+                </td>
+                <td>
+                    <form asp-controller="Search" asp-action="Results" method="post">
+                        <input hidden name="searchType" value="positionType" />
+                        <input hidden name="searchTerm" value="@job.PositionType" />
+                        <input type="submit" class="btn btn-link" value="@job.PositionType" />
+                    </form>
+                    @*<a asp-controller="Search" asp-action="Results" asp-route-searchType="positionType" asp-route-searchTerm="@job.PositionType">@job.PositionType</a>*@
+                </td>
+                <td>
+                    <form asp-controller="Search" asp-action="Results" method="post">
+                        <input hidden name="searchType" value="employer" />
+                        <input hidden name="searchTerm" value="@job.Employer" />
+                        <input type="submit" class="btn btn-link" value="@job.Employer" />
+                    </form>
+                    @*<a asp-controller="Search" asp-action="Results" asp-route-searchType="employer" asp-route-searchTerm="@job.Employer">@job.Employer</a>*@
+                </td>
+                <td>
+                    <form asp-controller="Search" asp-action="Results" method="post">
+                        <input hidden name="searchType" value="location" />
+                        <input hidden name="searchTerm" value="@job.Location" />
+                        <input type="submit" class="btn btn-link" value="@job.Location" />
+                    </form>
+                    @*<a asp-controller="Search" asp-action="Results" asp-route-searchType="location" asp-route-searchTerm="@job.Location">@job.Location</a>*@
+                </td>
+            </tr>
+        }
+    </table>
+}
+
+

@@ -8,158 +8,126 @@ namespace TechJobsMVC.Data
 {
     public class JobData
     {
-        static private string DATA_FILE = "Data/job_data.csv";
+        private const string DATA_FILE = "Data/job_data.csv";
 
-        static bool IsDataLoaded = false;
+        private static bool _isDataLoaded = false;
 
-        static List<Job> AllJobs;
-        static private List<JobField> AllEmployers = new List<JobField>();
-        static private List<JobField> AllLocations = new List<JobField>();
-        static private List<JobField> AllPositionTypes = new List<JobField>();
-        static private List<JobField> AllCoreCompetencies = new List<JobField>();
+        private static List<Job> _allJobs = new List<Job>();
+        private static readonly List<JobField> _allEmployers = new List<JobField>();
+        private static readonly List<JobField> _allLocations = new List<JobField>();
+        private static readonly List<JobField> _allPositionTypes = new List<JobField>();
+        private static readonly List<JobField> _allCoreCompetencies = new List<JobField>();
 
-        static public List<Job> FindAll()
+        public static List<Job> FindAll()
         {
             LoadData();
 
-            return new List<Job>(AllJobs);
+            return new List<Job>(_allJobs);
         }
 
-        static public List<Job> FindByColumnAndValue(string column, string value)
+        public static List<Job> FindByColumnAndValue(string column, string value)
         {
+            column ??= "all";
+            value ??= "all";
 
-            // load data, if not already loaded
             LoadData();
 
             List<Job> jobs = new List<Job>();
 
-            if (value.ToLower().Equals("all"))
-            {
+            if (value.ToLower().Equals("all"))            
                 return FindAll();
-            }
+            
 
             if (column.Equals("all"))
             {
                 jobs = FindByValue(value);
                 return jobs;
             }
-            foreach (Job job in AllJobs)
+            foreach (Job job in _allJobs)
             {
 
                 string aValue = GetFieldValue(job, column);
 
-                if (aValue != null && aValue.ToLower().Contains(value.ToLower()))
-                {
-                    jobs.Add(job);
-                }
+                if (aValue != null && aValue.ToLower().Contains(value.ToLower()))                
+                    jobs.Add(job);                
             }
 
             return jobs;
         }
 
-        static public string GetFieldValue(Job job, string fieldName)
+        public static string GetFieldValue(Job job, string fieldName)
         {
-            string theValue;
-            if (fieldName.Equals("name"))
-            {
-                theValue = job.Name;
-            }
-            else if (fieldName.Equals("employer"))
-            {
-                theValue = job.Employer.ToString();
-            }
-            else if (fieldName.Equals("location"))
-            {
-                theValue = job.Location.ToString();
-            }
-            else if (fieldName.Equals("positionType"))
-            {
-                theValue = job.PositionType.ToString();
-            }
-            else
-            {
-                theValue = job.CoreCompetency.ToString();
-            }
+            string result;
+            if (fieldName.Equals("name"))            
+                result = job.Name;            
+            else if (fieldName.Equals("employer"))            
+                result = job.Employer.ToString();            
+            else if (fieldName.Equals("location"))            
+                result = job.Location.ToString();            
+            else if (fieldName.Equals("positionType"))            
+                result = job.PositionType.ToString();            
+            else            
+                result = job.CoreCompetency.ToString();           
 
-            return theValue;
+            return result;
         }
 
-        static public List<Job> FindByValue(string value)
+        public static List<Job> FindByValue(string value)
         {
-
             // load data, if not already loaded
             LoadData();
 
             List<Job> jobs = new List<Job>();
 
-            foreach (Job job in AllJobs)
+            foreach (Job job in _allJobs)
             {
-
-                if (job.Name.ToLower().Contains(value.ToLower()))
-                {
+                if (job.Name != null && job.Name.ToLower().Contains(value.ToLower()))                
+                    jobs.Add(job);                
+                else if (job.Employer != null && job.Employer.ToString().ToLower().Contains(value.ToLower()))                
+                    jobs.Add(job);                
+                else if (job.Location.ToString().ToLower().Contains(value.ToLower()))                
+                    jobs.Add(job);                
+                else if (job.PositionType.ToString().ToLower().Contains(value.ToLower()))                
+                    jobs.Add(job);                
+                else if (job.CoreCompetency.ToString().ToLower().Contains(value.ToLower()))                
                     jobs.Add(job);
-                }
-                else if (job.Employer.ToString().ToLower().Contains(value.ToLower()))
-                {
-                    jobs.Add(job);
-                }
-                else if (job.Location.ToString().ToLower().Contains(value.ToLower()))
-                {
-                    jobs.Add(job);
-                }
-                else if (job.PositionType.ToString().ToLower().Contains(value.ToLower()))
-                {
-                    jobs.Add(job);
-                }
-                else if (job.CoreCompetency.ToString().ToLower().Contains(value.ToLower()))
-                {
-                    jobs.Add(job);
-                }
-
             }
 
             return jobs;
         }
 
-        static private object FindExistingObject(List<JobField> fieldlist, string value)
+        private static JobField? FindExistingObject(List<JobField> jobFields, string value)
         {
-            foreach (object item in fieldlist)
-            {
-                if (item.ToString().ToLower().Equals(value.ToLower()))
-                {
-                    return item;
-                }
-            }
+            foreach (JobField jobField in jobFields)
+                if (jobField.ToString().ToLower().Equals(value.ToLower()))
+                    return jobField;
+            
             return null;
         }
 
-        static private void LoadData()
+        private static void LoadData()
         {
-            if(IsDataLoaded)
-            {
-                return;
-            }
+            if(_isDataLoaded)            
+                return;            
 
             List<string[]> rows = new List<string[]>();
-
 
             using (StreamReader reader = File.OpenText(DATA_FILE))
             {
                 while (reader.Peek() >= 0)
                 {
-                    string line = reader.ReadLine();
+                    string line = reader.ReadLine() ?? "";
                     string[] rowArray = CSVRowToStringArray(line);
-                    if (rowArray.Length > 0)
-                    {
+                    if (rowArray.Length > 0)                    
                         rows.Add(rowArray);
-                    }
+                    
                 }
             }
 
             string[] headers = rows[0];
             rows.Remove(headers);
 
-            AllJobs = new List<Job>();
+            _allJobs = new List<Job>();
 
             // Parse each row array 
             foreach (string[] row in rows)
@@ -170,41 +138,36 @@ namespace TechJobsMVC.Data
                 string aPositionType = row[3];
                 string aCoreCompetency = row[4];
 
-                Employer newEmployer = (Employer)FindExistingObject(AllEmployers, anEmployer);
-                Location newLocation = (Location)FindExistingObject(AllLocations, aLocation);
-                PositionType newPositionType = (PositionType)FindExistingObject(AllPositionTypes, aPositionType);
-                CoreCompetency newCoreCompetency = (CoreCompetency)FindExistingObject(AllCoreCompetencies, aCoreCompetency);
-
-                if (newEmployer == null)
+                if (!(FindExistingObject(_allEmployers, anEmployer) is Employer newEmployer))
                 {
                     newEmployer = new Employer(anEmployer);
-                    AllEmployers.Add(newEmployer);
+                    _allEmployers.Add(newEmployer);
                 }
 
-                if (newLocation == null)
+                if (!(FindExistingObject(_allLocations, aLocation) is Location newLocation))
                 {
                     newLocation = new Location(aLocation);
-                    AllLocations.Add(newLocation);
+                    _allLocations.Add(newLocation);
                 }
 
-                if (newPositionType == null)
+                if (!(FindExistingObject(_allPositionTypes, aPositionType) is PositionType newPositionType))
                 {
                     newPositionType = new PositionType(aPositionType);
-                    AllPositionTypes.Add(newPositionType);
+                    _allPositionTypes.Add(newPositionType);
                 }
 
-                if (newCoreCompetency == null)
+                if (!(FindExistingObject(_allCoreCompetencies, aCoreCompetency) is CoreCompetency newCoreCompetency))
                 {
                     newCoreCompetency = new CoreCompetency(aCoreCompetency);
-                    AllCoreCompetencies.Add(newCoreCompetency);
+                    _allCoreCompetencies.Add(newCoreCompetency);
                 }
 
                 Job newJob = new Job(aName, newEmployer, newLocation, newPositionType, newCoreCompetency);
 
-                AllJobs.Add(newJob);
+                _allJobs.Add(newJob);
             }
 
-            IsDataLoaded = true;
+            _isDataLoaded = true;
         }
 
         private static string[] CSVRowToStringArray(string row, char fieldSeparator = ',', char stringSeparator = '\"')
@@ -223,14 +186,10 @@ namespace TechJobsMVC.Data
                 }
                 else
                 {
-                    if (c == stringSeparator)
-                    {
-                        isBetweenQuotes = !isBetweenQuotes;
-                    }
-                    else
-                    {
-                        valueBuilder.Append(c);
-                    }
+                    if (c == stringSeparator)                    
+                        isBetweenQuotes = !isBetweenQuotes;                    
+                    else                    
+                        valueBuilder.Append(c);                    
                 }
             }
 
@@ -241,32 +200,32 @@ namespace TechJobsMVC.Data
             return rowValues.ToArray();
         }
 
-        static public List<JobField> GetAllEmployers()
+        public static List<JobField> GetAllEmployers()
         {
             LoadData();
-            AllEmployers.Sort(new NameSorter());
-            return AllEmployers;
+            _allEmployers.Sort(new NameSorter());
+            return _allEmployers;
         }
 
-        static public List<JobField> GetAllLocations()
+        public static List<JobField> GetAllLocations()
         {
             LoadData();
-            AllLocations.Sort(new NameSorter());
-            return AllLocations;
+            _allLocations.Sort(new NameSorter());
+            return _allLocations;
         }
 
-        static public List<JobField> GetAllPositionTypes()
+        public static List<JobField> GetAllPositionTypes()
         {
             LoadData();
-            AllPositionTypes.Sort(new NameSorter());
-            return AllPositionTypes;
+            _allPositionTypes.Sort(new NameSorter());
+            return _allPositionTypes;
         }
 
-        static public List<JobField> GetAllCoreCompetencies()
+        public static List<JobField> GetAllCoreCompetencies()
         {
             LoadData();
-            AllCoreCompetencies.Sort(new NameSorter());
-            return AllCoreCompetencies;
+            _allCoreCompetencies.Sort(new NameSorter());
+            return _allCoreCompetencies;
         }
     }
 }

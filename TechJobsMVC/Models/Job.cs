@@ -5,18 +5,18 @@ namespace TechJobsMVC.Models
     {
 
         public int Id { get; }
-        static private int nextId = 1;
+        private static int _nextId = 1;
 
-        public string Name { get; set; }
-        public Employer Employer { get; set; }
-        public Location Location { get; set; }
-        public PositionType PositionType { get; set; }
-        public CoreCompetency CoreCompetency { get; set; }
+        public string Name { get; set; } = Utils.DATA_NOT_AVAILABLE;
+        public Employer Employer { get; set; } = new Employer();
+        public Location Location { get; set; } = new Location();
+        public PositionType PositionType { get; set; } = new PositionType();
+        public CoreCompetency CoreCompetency { get; set; } = new CoreCompetency();
 
         public Job()
         {
-            Id = nextId;
-            nextId++;
+            Id = _nextId;
+            _nextId++;
         }
 
         public Job(string name, Employer employer, Location location, PositionType positionType, CoreCompetency coreCompetency) : this()
@@ -30,29 +30,7 @@ namespace TechJobsMVC.Models
 
         public override string ToString()
         {
-            string output = "";
-            if (Name.Equals(""))
-            {
-                Name = "Data not available";
-            }
-            if (Employer.Value.Equals("") || Employer.Value == null)
-            {
-                Employer.Value = "Data not available";
-            }
-            if (Location.Value.Equals("") || Location.Value == null)
-            {
-                Location.Value= "Data not available";
-            }
-            if (CoreCompetency.Value.Equals("") || CoreCompetency.Value == null)
-            {
-                CoreCompetency.Value = "Data not available";
-            }
-            if (PositionType.Value.Equals("") || PositionType.Value == null)
-            {
-                PositionType.Value = "Data not available";
-            }
-
-            output = string.Format("\nID: %d\n" +
+            string output = string.Format("\nID: %d\n" +
                     "Name: %s\n" +
                     "Employer: %s\n" +
                     "Location: %s\n" +
@@ -61,7 +39,7 @@ namespace TechJobsMVC.Models
             return output;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Job job &&
                    Id == job.Id;

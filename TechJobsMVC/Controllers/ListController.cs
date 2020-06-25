@@ -12,15 +12,15 @@ namespace TechJobsMVC.Controllers
 {
     public class ListController : Controller
     {
-        internal static Dictionary<string, string> ColumnChoices = new Dictionary<string, string>()
+        internal static Dictionary<string, string> ColumnChoices { get; set; } = new Dictionary<string, string>()
         {
             {"all", "All"},
+            {"coreCompetency", "Skill"},
+            {"positionType", "Position"},
             {"employer", "Employer"},
-            {"location", "Location"},
-            {"positionType", "Position Type"},
-            {"coreCompetency", "Skill"}
+            {"location", "Location"}
         };
-        internal static Dictionary<string, List<JobField>> TableChoices = new Dictionary<string, List<JobField>>()
+        internal static Dictionary<string, List<JobField>> TableChoices { get; set; } = new Dictionary<string, List<JobField>>()
         {
             {"employer", JobData.GetAllEmployers()},
             {"location", JobData.GetAllLocations()},
@@ -44,6 +44,7 @@ namespace TechJobsMVC.Controllers
         public IActionResult Jobs(string column, string value)
         {
             List<Job> jobs;
+
             if (column.ToLower().Equals("all"))
             {
                 jobs = JobData.FindAll();

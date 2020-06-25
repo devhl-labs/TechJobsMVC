@@ -4,19 +4,17 @@ namespace TechJobsMVC.Models
     public abstract class JobField
     {
         public int Id { get; }
-        static private int nextId = 1;
+        private static int _nextId = 1;
+
         public string Value { get; set; }
 
-        public JobField()
+        public JobField(string value = Utils.DATA_NOT_AVAILABLE)
         {
-            Id = nextId;
-            nextId++;
-        }
+            Id = _nextId;
 
-        public JobField(string value) : this()
-        {
+            _nextId++;
+
             Value = value;
-
         }
 
         public override string ToString()
@@ -24,7 +22,7 @@ namespace TechJobsMVC.Models
             return Value;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is JobField field &&
                    Id == field.Id;

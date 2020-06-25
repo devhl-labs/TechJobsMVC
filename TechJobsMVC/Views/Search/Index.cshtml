@@ -6,28 +6,38 @@
         <h2>Search by:</h2>
 
         <p>
-            @foreach (var column in ViewBag.columns)
+            @foreach (KeyValuePair<string, string> column in ViewBag.columns)
             {
-                <span>
-                    <input type="radio" name="searchType" id="@column.Key" value="@column.Key" checked="@column.Key == 'all'" />
-                    <label for="@column.Key">@column.Value</label>
-                </span>
+            <span>
+        
+                <input type="radio" name="searchType" id="@column.Key" value="@column.Key" @if(ViewBag.searchType == column.Key){ <text>checked</text> }/>
+
+                <label for="@column.Key">@column.Value</label>
+            </span>
             }
 
         </p>
 
         <p>
+
             <label for="searchTerm">Keyword:</label>
-            <input type="text" name="searchTerm" id="searchTerm" />
+
+            <input type="text" name="searchTerm" id="searchTerm" @if (ViewBag.searchTerm != null) { <text>value="@ViewBag.searchTerm"</text>} />
+
         </p>
 
         <input type="submit" value="Search" />
+        <script>
+            function resetClicked() {
+                all.checked = true;
+                searchTerm.value = '';
+            }
+        </script>
+        <input type="button" value="Reset" onclick="resetClicked()"/>
     </form>
 
     <hr />
 
-    @{
-        //TODO #4: Loop over the search results to display all job fields.
-    }
+    @await Html.PartialAsync("JobTable")
 
 </div>
